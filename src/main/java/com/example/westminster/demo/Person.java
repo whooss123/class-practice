@@ -1,26 +1,24 @@
 package com.example.westminster.demo;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 public class Person {
-
+    private int id;
     private String name;
-    private Cloth currentCloth;
+    private LocalDate birthDate;
 
-    public Person(String name) {
+
+    public Person(int id, String name, LocalDate birthDate) {
+        this.id = id;
         this.name = name;
+        this.birthDate = birthDate;
     }
 
-    // The behaviour your sir asked for
-    public String wearCloth(Cloth cloth) {
-        this.currentCloth = cloth;
-        return name + " is wearing a " + cloth.getColor() + " " + cloth.getName()
-                + " (size " + cloth.getSize() + ")";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Cloth getCurrentCloth() {
-        return currentCloth;
+    String calculateAge() {
+        LocalDate now = LocalDate.now();
+        Period period = Period.between(birthDate, now);
+        int years = period.getYears();
+        return String.join(" ", "Person born in", this.birthDate.toString(), "is", String.valueOf(years), "old today");
     }
 }
