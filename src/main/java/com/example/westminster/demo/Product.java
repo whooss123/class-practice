@@ -2,82 +2,76 @@ package com.example.westminster.demo;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class Product {
-    private int id;
-    private String name;
-    private int qty;
-    private boolean inStock;
-    private double unitPrice;
+import org.springframework.stereotype.Service;
 
-    private static int instanceCount = 0;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-    @JsonCreator
-    public Product() {
-        this(0, null, 0, false, 0.0);
+@Service
+public class ProductService {
+    private final List<Product> products = new ArrayList<>();
+    private int nextId = 1;
+
+    public List<Product> getAllProducts() {
+        return products;
     }
 
-    public Product(int id, String name, int qty, boolean inStock, double unitPrice) {
-        instanceCount++;
-        this.id = id;
-        this.name = name;
-        this.qty = qty;
-        this.inStock = inStock;
-        this.unitPrice = unitPrice;
+    public Optional<Product> getProductById(int id) {
+        return products.stream().filter(p -> p.getId() == id).findFirst();
     }
 
-    public double calculateTotal() {
-        return this.qty * this.unitPrice;
+    public List<Product> findByName(String name) {
+        return products.stream()
+                .filter(p -> p.getName().contains(name)).toList();
     }
 
-    public int getId() {
-        return this.id;
+    public Product addProduct(Product product) {
+        DigitalProduct dp = new DigitalProduct(112,
+                "Digital Product",
+                2,
+                true,
+                34.99,
+                "http://xsdfa.com/file/3434",
+                23.33);
+
+
+        product.setId(nextId++);
+        products.add(product);
+        return product;
     }
 
-    public String getName() {
-        return this.name;
+    public List<Product> addGetInheritedProduct() {
+        Product dp = new DigitalProduct(112,
+                "Digital Product",
+                2,
+                true,
+                34.99,
+                "http://xsdfa.com/file/3434",
+                23.33);
+        Product physicalProduct = new PhysicalProduct(122,
+                "Physical Product",
+                3,
+                true,
+                11.99,
+                3.09,
+                "20x10");
+        products.add(dp);
+        products.add(physicalProduct);
+        return this.products;
+    }
+    public void deleteProduct(int id) {
+        products.removeIf(p -> p.getId() == id);
     }
 
-    public int getQty() {
-        return this.qty;
+    public void applyDiscounts(List<Product> products) {
+        products.forEach(product -> {
+            if(product instanceof Discountable) {
+                ((Discountable) product).applyDiscount(0.10);
+            }
+        });
     }
-
-    public boolean getInStock() {
-        return this.inStock;
-    }
-
-    public double getUnitPrice() {
-        return this.unitPrice;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setQty(int qty) {
-        this.qty = qty;
-    }
-
-    public void setInStock(boolean inStock) {
-        this.inStock = inStock;
-    }
-
-    public void setUnitPrice(double unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public static int getInstanceCount() {
-        return instanceCount;
-    }
-
-    public String onFulfillOrder() {
-        return "order fulfilled";
-    }
-
-    public String getSummary() {
-        return name + " — £" + unitPrice;
+    public List<Product> getDiscountedProducts() {
+        return products;
     }
 }
